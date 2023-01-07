@@ -15,14 +15,14 @@ from newsapi import NewsApiClient
 
 COUNTRIES_LANGUAGES = {
     "in": "en",
-    "us": "en",
-    "au": "en",
-    "ru": "ru",
-    "fr": "fr",
-    "gb": "en",
+    # "us": "en",
+    # "au": "en",
+    # "ru": "ru",
+    # "fr": "fr",
+    # "gb": "en",
 }
 CATEGORIES = [
-    "business",
+    # "business",
     # "entertainment",
     # "general",
     # "health",
@@ -48,36 +48,34 @@ def get_key():
 
 
 def push_to_github(filename, content):
-    print(filename)
-    print(content)
-    # url = "https://api.github.com/repos/SauravKanchan/NewsAPI/contents/" + filename
-    # base64content = base64.b64encode(bytes(json.dumps(content), "utf-8"))
-    # data = requests.get(
-    #     url + "?ref=master", headers={"Authorization": "token " + GITHUB_API_TOKEN}
-    # ).json()
-    # sha = data["sha"]
-    # if base64content.decode("utf-8") != data["content"].replace("\n", ""):
-    #     message = json.dumps(
-    #         {
-    #             "message": "update " + filename,
-    #             "branch": "master",
-    #             "content": base64content.decode("utf-8"),
-    #             "sha": sha,
-    #         }
-    #     )
+    url = "https://api.github.com/repos/abhishek-joflee/newsAPI/contents/" + filename
+    base64content = base64.b64encode(bytes(json.dumps(content), "utf-8"))
+    data = requests.get(
+        url + "?ref=master", headers={"Authorization": "token " + GITHUB_API_TOKEN}
+    ).json()
+    sha = data["sha"]
+    if base64content.decode("utf-8") != data["content"].replace("\n", ""):
+        message = json.dumps(
+            {
+                "message": "update " + filename,
+                "branch": "master",
+                "content": base64content.decode("utf-8"),
+                "sha": sha,
+            }
+        )
 
-    #     resp = requests.put(
-    #         url,
-    #         data=message,
-    #         headers={
-    #             "Content-Type": "application/json",
-    #             "Authorization": "token " + GITHUB_API_TOKEN,
-    #         },
-    #     )
+        resp = requests.put(
+            url,
+            data=message,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "token " + GITHUB_API_TOKEN,
+            },
+        )
 
-    #     print(resp)
-    # else:
-    #     print("Everything up to date")
+        print(resp)
+    else:
+        print("Everything up to date")
 
 
 @app.route("/")
@@ -86,6 +84,7 @@ def hello_world():
 
 
 def update_top_headline():
+    print("-----")
     for category in CATEGORIES:
         for country in COUNTRIES_LANGUAGES:
             print(
@@ -107,6 +106,7 @@ def update_top_headline():
 
 
 def update_everything():
+    print("-----")
     newsapi = NewsApiClient(api_key=get_key())
     for source in SOURCES:
         print(
@@ -127,7 +127,7 @@ def update_everything():
 
 
 scheduler = BackgroundScheduler()
-INTERVAL = 0.5
+INTERVAL = 0.2
 scheduler.add_job(func=update_top_headline, trigger="interval", minutes=INTERVAL)
 scheduler.add_job(func=update_everything, trigger="interval", minutes=INTERVAL)
 if not scheduler.running:
